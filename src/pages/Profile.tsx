@@ -1,14 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import { useProfile } from '../lib/ProfileContext';
 import { NavBar } from '../components/NavBar';
-import { getRankProgress, getLevelProgress } from '../data/ranks';
+import { getRankPosition, getLevelProgress } from '../data/ranks';
 
 export function Profile() {
   const { profile, resetProfile } = useProfile();
   const navigate = useNavigate();
   if (!profile) return null;
 
-  const rank = getRankProgress(profile.exp);
+  const position = getRankPosition(profile.exp);
   const level = getLevelProgress(profile.exp);
 
   function handleReset() {
@@ -21,10 +21,12 @@ export function Profile() {
   return (
     <div className="mx-auto max-w-md px-6 pb-28 pt-10">
       <div className="mb-8 text-center">
-        <div className="mb-2 text-5xl">{rank.current.icon}</div>
+        <div className="mb-2 text-5xl">{position.rank.icon}</div>
         <div className="text-2xl font-bold text-text">{profile.name}</div>
-        <div className="text-primary font-semibold">{rank.current.name} · Level {level.level}</div>
-        <div className="text-xs text-text-dim mt-1">{rank.current.theme}</div>
+        <div className="text-primary font-semibold">
+          {position.rank.name} {position.level} · Div {position.division} · Level {level.level}
+        </div>
+        <div className="text-xs text-gold mt-1">{position.levelName}</div>
       </div>
 
       <div className="mb-6 rounded-xl border border-border bg-surface p-4">

@@ -2,15 +2,14 @@ import { useProfile } from '../lib/ProfileContext';
 import { NavBar } from '../components/NavBar';
 import { QuestCard } from '../components/QuestCard';
 import { ProgressRing } from '../components/ProgressRing';
-import { getLevelProgress, getRankProgress, getSubLevelLabel } from '../data/ranks';
+import { getLevelProgress, getRankPosition } from '../data/ranks';
 
 export function Dashboard() {
   const { profile, isQuestCompletedToday } = useProfile();
   if (!profile) return null;
 
   const level = getLevelProgress(profile.exp);
-  const rank = getRankProgress(profile.exp);
-  const sub = getSubLevelLabel(profile.exp);
+  const position = getRankPosition(profile.exp);
 
   const completedToday = profile.activeQuests.filter((q) => isQuestCompletedToday(q.id)).length;
   const totalToday = profile.activeQuests.length;
@@ -41,9 +40,9 @@ export function Dashboard() {
           </ProgressRing>
           <div className="flex-1">
             <div className="text-sm font-semibold text-primary">
-              {rank.current.icon} {rank.current.name.toUpperCase()} {sub}
+              {position.rank.icon} {position.rank.name.toUpperCase()} {position.level} · Div {position.division}
             </div>
-            <div className="text-xs text-text-dim mb-2">{rank.current.theme}</div>
+            <div className="text-xs text-gold mb-1">{position.levelName}</div>
             <div className="text-xs text-text-dim">
               {profile.exp - level.floor}/{level.ceiling - level.floor} EXP to level {level.level + 1}
             </div>

@@ -6,6 +6,7 @@ import { Onboarding } from './pages/Onboarding';
 import { RevealRank } from './pages/RevealRank';
 import { Dashboard } from './pages/Dashboard';
 import { Quests } from './pages/Quests';
+import { Ranks } from './pages/Ranks';
 import { QuestDetail } from './pages/QuestDetail';
 import { Progress } from './pages/Progress';
 import { Profile } from './pages/Profile';
@@ -64,6 +65,14 @@ function AppRoutes() {
         element={
           <RequireOnboarded>
             <QuestDetail />
+          </RequireOnboarded>
+        }
+      />
+      <Route
+        path="/ranks"
+        element={
+          <RequireOnboarded>
+            <Ranks />
           </RequireOnboarded>
         }
       />

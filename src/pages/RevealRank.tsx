@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProfile } from '../lib/ProfileContext';
-import { getRankProgress } from '../data/ranks';
+import { getRankPosition } from '../data/ranks';
 import { TreasureChest, type ChestState } from '../components/TreasureChest';
 import { Confetti } from '../components/Confetti';
 
@@ -11,7 +11,8 @@ export function RevealRank() {
   const [state, setState] = useState<ChestState>('closed');
 
   if (!profile) return null;
-  const rank = getRankProgress(profile.exp).current;
+  const position = getRankPosition(profile.exp);
+  const rank = position.rank;
 
   function handleClick() {
     if (state !== 'closed') return;
@@ -40,8 +41,11 @@ export function RevealRank() {
         <div className="relative w-full animate-pop overflow-hidden rounded-2xl border border-gold/50 bg-surface p-6">
           <Confetti />
           <div className="mb-2 text-5xl">{rank.icon}</div>
-          <div className="text-2xl font-bold text-text">{rank.name.toUpperCase()}</div>
-          <div className="mb-4 text-sm text-text-dim">{rank.theme}</div>
+          <div className="text-2xl font-bold text-text">
+            {rank.name.toUpperCase()} {position.level} · DIV {position.division}
+          </div>
+          <div className="mb-1 text-sm text-gold">{position.levelName}</div>
+          <div className="mb-4 text-xs text-text-dim">{rank.theme}</div>
           <div className="mb-6 inline-block rounded-full border border-border bg-surface-hi px-3 py-1 text-xs text-text-dim">
             Starting EXP: {profile.exp}
           </div>
