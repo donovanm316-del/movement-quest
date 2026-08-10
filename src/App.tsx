@@ -3,6 +3,7 @@ import { Navigate, Route, HashRouter, Routes } from 'react-router-dom';
 import { ProfileProvider, useProfile } from './lib/ProfileContext';
 import { Landing } from './pages/Landing';
 import { Onboarding } from './pages/Onboarding';
+import { RevealRank } from './pages/RevealRank';
 import { Dashboard } from './pages/Dashboard';
 import { Quests } from './pages/Quests';
 import { QuestDetail } from './pages/QuestDetail';
@@ -32,6 +33,14 @@ function AppRoutes() {
           <RequireProfile>
             <Onboarding />
           </RequireProfile>
+        }
+      />
+      <Route
+        path="/reveal"
+        element={
+          <RequireOnboarded>
+            <RevealRank />
+          </RequireOnboarded>
         }
       />
       <Route

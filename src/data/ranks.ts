@@ -1,4 +1,4 @@
-import type { Rank } from '../lib/types';
+import type { ExperienceLevel, OnboardingAnswers, Rank } from '../lib/types';
 
 export const RANKS: Rank[] = [
   { id: 'beginner', name: 'Beginner', icon: '🌱', theme: 'Starting your journey', minExp: 0 },
@@ -59,4 +59,22 @@ export function getSubLevelLabel(exp: number): string {
   const sub = Math.min(LEVELS_PER_RANK, Math.floor((pct / 100) * LEVELS_PER_RANK) + 1);
   const numeral = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'][sub - 1];
   return numeral;
+}
+
+const ACTIVITY_SCORE: Record<ExperienceLevel, number> = { new: 0, casual: 1, active: 2, regular: 3 };
+const WORKOUT_SCORE: Record<OnboardingAnswers['pastWorkouts'], number> = {
+  never: 0,
+  few: 1,
+  sometimes: 2,
+  regularly: 3,
+};
+
+// Starting EXP by combined experience score (0-6). Caps at Gold — someone who
+// already trains regularly shouldn't be labeled "Beginner", but Platinum and
+// above still has to be earned through actual quest consistency in the app.
+const STARTING_EXP_BY_SCORE = [0, 500, 900, 1500, 2500, 3500, 4500];
+
+export function computeStartingExp(onboarding: OnboardingAnswers): number {
+  const score = ACTIVITY_SCORE[onboarding.activityLevel] + WORKOUT_SCORE[onboarding.pastWorkouts];
+  return STARTING_EXP_BY_SCORE[score];
 }

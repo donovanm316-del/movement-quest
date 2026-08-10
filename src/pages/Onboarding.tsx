@@ -137,7 +137,7 @@ export function Onboarding() {
       targetMuscleGroups,
     };
     completeOnboarding(answers);
-    navigate('/dashboard');
+    navigate('/reveal');
   }
 
   return (

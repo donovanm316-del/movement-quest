@@ -3,7 +3,7 @@ import type { CompletedQuest, OnboardingAnswers, Quest, UserProfile } from './ty
 import { createProfile, loadProfile, saveProfile, clearProfile } from './storage';
 import { generateDailyQuests, isNewDay, skillsForQuest } from './quests';
 import { ACHIEVEMENTS } from '../data/achievements';
-import { getLevel, getRankForExp } from '../data/ranks';
+import { computeStartingExp, getLevel, getRankForExp } from '../data/ranks';
 
 interface LevelUpInfo {
   fromLevel: number;
@@ -61,6 +61,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       return {
         ...p,
         onboarding: answers,
+        exp: computeStartingExp(answers),
         activeQuests: generateDailyQuests(answers),
         activeQuestDate: todayKey(),
         checkInDates: [todayKey()],
