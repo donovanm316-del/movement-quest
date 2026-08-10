@@ -1,5 +1,6 @@
 import { EXERCISES } from '../data/exercises';
-import type { Difficulty, Equipment, Exercise, OnboardingAnswers, Quest, QuestType, UserProfile } from './types';
+import { routinesForMuscleGroup, MUSCLE_GROUP_LABELS } from '../data/routines';
+import type { Difficulty, Equipment, Exercise, MuscleGroup, OnboardingAnswers, Quest, QuestType, UserProfile } from './types';
 
 interface QuestTemplate {
   type: QuestType;
@@ -77,8 +78,39 @@ function pickOptions(category: Exercise['category'], count: number, onboarding: 
   return shuffled.slice(0, Math.min(count, shuffled.length));
 }
 
+function dayIndex(seed: string): number {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  return hash;
+}
+
+function pickTargetQuest(onboarding: OnboardingAnswers, seed: string, i: number): Quest | null {
+  const groups = onboarding.targetMuscleGroups;
+  if (!groups || groups.length === 0) return null;
+
+  const group: MuscleGroup = groups[dayIndex(seed) % groups.length];
+  const candidates = routinesForMuscleGroup(group);
+  if (candidates.length === 0) return null;
+
+  const routine = candidates[dayIndex(seed + group) % candidates.length];
+  const groupInfo = MUSCLE_GROUP_LABELS[group];
+
+  return {
+    id: `${seed}-target-${i}`,
+    type: 'target',
+    title: `${groupInfo.icon} ${groupInfo.label} Day`,
+    description: routine.description,
+    category: 'strength',
+    exp: routine.exp,
+    options: [],
+    routineId: routine.id,
+    muscleGroup: group,
+    recommendedMinutes: '15-25 minutes',
+  };
+}
+
 export function generateDailyQuests(onboarding: OnboardingAnswers | null, seed = new Date().toDateString()): Quest[] {
-  return TEMPLATES.map((template, i) => {
+  const quests: Quest[] = TEMPLATES.map((template, i) => {
     const options = pickOptions(template.category, template.optionCount, onboarding);
     return {
       id: `${seed}-${template.type}-${i}`,
@@ -91,6 +123,13 @@ export function generateDailyQuests(onboarding: OnboardingAnswers | null, seed =
       options: options.map((o) => ({ exerciseId: o.id })),
     };
   });
+
+  if (onboarding) {
+    const targetQuest = pickTargetQuest(onboarding, seed, quests.length);
+    if (targetQuest) quests.push(targetQuest);
+  }
+
+  return quests;
 }
 
 export function isNewDay(lastDate: string): boolean {
@@ -99,6 +138,10 @@ export function isNewDay(lastDate: string): boolean {
 
 export function skillsForQuest(quest: Quest): Partial<UserProfile['skills']> {
   const gain: Partial<UserProfile['skills']> = { consistency: 1 };
+  if (quest.type === 'target') {
+    gain.strength = 4;
+    return gain;
+  }
   switch (quest.category) {
     case 'strength':
       gain.strength = 2;

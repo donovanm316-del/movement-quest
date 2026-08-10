@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #0f1117;
-  --color-surface: #1a1d29;
-  --color-surface-hi: #232637;
+  --color-bg: #0b0d14;
+  --color-surface: #171a26;
+  --color-surface-hi: #212536;
   --color-border: #2e3244;
   --color-text: #e5e7ef;
   --color-text-dim: #9296ab;
@@ -11,6 +11,13 @@
   --color-primary-dim: #5a3fd6;
   --color-gold: #ffb347;
   --color-success: #4ade80;
+
+  --color-strength: #ff6b5b;
+  --color-cardio: #4fb2ff;
+  --color-mobility: #34d399;
+  --color-skills: #c084fc;
+  --color-games: #f472b6;
+  --color-target: #ffb347;
 }
 
 :root {
@@ -19,7 +26,11 @@
 
 body {
   margin: 0;
-  background: var(--color-bg);
+  background:
+    radial-gradient(ellipse 900px 500px at 15% -10%, rgba(124, 92, 255, 0.16), transparent),
+    radial-gradient(ellipse 700px 500px at 100% 0%, rgba(255, 179, 71, 0.08), transparent),
+    var(--color-bg);
+  background-attachment: fixed;
   color: var(--color-text);
   font-family: 'Segoe UI', system-ui, Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -42,4 +53,42 @@ body {
 
 .animate-pop {
   animation: pop 0.25s ease-out;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(320px) rotate(540deg);
+    opacity: 0;
+  }
+}
+
+.animate-confetti {
+  animation: confetti-fall 1.4s ease-in forwards;
+}
+
+@keyframes ring-fill {
+  from {
+    stroke-dashoffset: var(--ring-from);
+  }
+  to {
+    stroke-dashoffset: var(--ring-to);
+  }
 }

@@ -1,10 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProfile } from '../lib/ProfileContext';
-import type { Environment, Equipment, ExperienceLevel, Goal, OnboardingAnswers } from '../lib/types';
+import { MUSCLE_GROUP_LABELS } from '../data/routines';
+import type { Environment, Equipment, ExperienceLevel, Goal, MuscleGroup, OnboardingAnswers } from '../lib/types';
 
-const STEPS = ['activity', 'past', 'interests', 'environment', 'equipment', 'goals'] as const;
+const STEPS = ['activity', 'past', 'interests', 'environment', 'equipment', 'goals', 'focus'] as const;
 type Step = (typeof STEPS)[number];
+
+const MUSCLE_GROUP_OPTIONS = (Object.entries(MUSCLE_GROUP_LABELS) as [MuscleGroup, { label: string; icon: string }][]).map(
+  ([value, info]) => ({ value, label: info.label, icon: info.icon }),
+);
 
 const ACTIVITY_OPTIONS: { value: ExperienceLevel; label: string }[] = [
   { value: 'new', label: "I'm just getting started" },
@@ -92,6 +97,7 @@ export function Onboarding() {
   const [environment, setEnvironment] = useState<Environment[]>([]);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [targetMuscleGroups, setTargetMuscleGroups] = useState<MuscleGroup[]>([]);
 
   function toggle<T>(list: T[], value: T, setter: (v: T[]) => void) {
     setter(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
@@ -111,6 +117,8 @@ export function Onboarding() {
         return equipment.length > 0;
       case 'goals':
         return goals.length > 0;
+      case 'focus':
+        return true;
     }
   }
 
@@ -126,6 +134,7 @@ export function Onboarding() {
       environment,
       equipment,
       goals,
+      targetMuscleGroups,
     };
     completeOnboarding(answers);
     navigate('/dashboard');
@@ -217,6 +226,26 @@ export function Onboarding() {
               {GOAL_OPTIONS.map((o) => (
                 <OptionButton key={o.value} selected={goals.includes(o.value)} onClick={() => toggle(goals, o.value, setGoals)}>
                   {o.label}
+                </OptionButton>
+              ))}
+            </div>
+          </>
+        )}
+
+        {step === 'focus' && (
+          <>
+            <h2 className="mb-1 text-2xl font-bold text-text">Any areas you want to focus on?</h2>
+            <p className="mb-6 text-text-dim text-sm">
+              Optional — we'll add a targeted routine quest for these areas. Skip if you'd rather keep things varied.
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {MUSCLE_GROUP_OPTIONS.map((o) => (
+                <OptionButton
+                  key={o.value}
+                  selected={targetMuscleGroups.includes(o.value)}
+                  onClick={() => toggle(targetMuscleGroups, o.value, setTargetMuscleGroups)}
+                >
+                  {o.icon} {o.label}
                 </OptionButton>
               ))}
             </div>

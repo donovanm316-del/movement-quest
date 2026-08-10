@@ -2,6 +2,8 @@ export type ExperienceLevel = 'new' | 'casual' | 'active' | 'regular';
 
 export type Category = 'strength' | 'cardio' | 'mobility' | 'skills' | 'games';
 
+export type MuscleGroup = 'chest' | 'back' | 'legs' | 'shoulders' | 'arms' | 'core' | 'full_body';
+
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced';
 
 export type Environment = 'home' | 'gym' | 'outdoors' | 'sports_facility' | 'limited_space';
@@ -20,6 +22,7 @@ export interface Exercise {
   id: string;
   name: string;
   category: Category;
+  muscleGroup?: MuscleGroup;
   difficulty: Difficulty;
   equipment: Equipment[];
   description: string;
@@ -28,7 +31,24 @@ export interface Exercise {
   alternative?: string;
 }
 
-export type QuestType = 'starter' | 'movement' | 'recovery' | 'skill';
+export interface RoutineExerciseSpec {
+  exerciseId: string;
+  sets: number;
+  reps?: string;
+  durationSeconds?: number;
+}
+
+export interface WorkoutRoutine {
+  id: string;
+  title: string;
+  muscleGroup: MuscleGroup;
+  difficulty: Difficulty;
+  description: string;
+  exercises: RoutineExerciseSpec[];
+  exp: number;
+}
+
+export type QuestType = 'starter' | 'movement' | 'recovery' | 'skill' | 'target';
 
 export interface QuestOption {
   exerciseId: string;
@@ -42,6 +62,8 @@ export interface Quest {
   category: Category;
   exp: number;
   options: QuestOption[];
+  routineId?: string;
+  muscleGroup?: MuscleGroup;
   recommendedMinutes?: string;
 }
 
@@ -71,6 +93,7 @@ export interface OnboardingAnswers {
   environment: Environment[];
   equipment: Equipment[];
   goals: Goal[];
+  targetMuscleGroups: MuscleGroup[];
 }
 
 export interface UserProfile {
