@@ -5,8 +5,9 @@ import { getExercise } from '../data/exercises';
 import { getRoutine } from '../data/routines';
 import { LevelUpModal } from '../components/LevelUpModal';
 import { Confetti } from '../components/Confetti';
+import { ExerciseInfoModal } from '../components/ExerciseInfoModal';
 import { questStyle } from '../lib/categoryStyle';
-import type { Quest } from '../lib/types';
+import type { Exercise, Quest } from '../lib/types';
 
 interface LevelUpInfo {
   fromLevel: number;
@@ -128,6 +129,7 @@ function StandardQuestScreen({
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
   const [phase, setPhase] = useState<'select' | 'active' | 'done'>('select');
   const [result, setResult] = useState<CompletionResult | null>(null);
+  const [infoExercise, setInfoExercise] = useState<Exercise | null>(null);
 
   const options = quest.options.map((o) => getExercise(o.exerciseId)).filter(Boolean);
 
@@ -154,18 +156,26 @@ function StandardQuestScreen({
           <h2 className="mb-3 font-semibold text-text">Choose an activity:</h2>
           <div className="mb-6 space-y-2">
             {options.map((ex) => (
-              <button
+              <div
                 key={ex!.id}
-                onClick={() => setSelectedExercise(ex!.id)}
-                className={`w-full rounded-lg border px-4 py-3 text-left transition ${
+                className={`flex items-center gap-2 rounded-lg border px-2 py-2 transition ${
                   selectedExercise === ex!.id
                     ? 'border-primary bg-primary/10 text-text'
                     : 'border-border bg-surface text-text-dim hover:border-primary/50'
                 }`}
               >
-                <div className="font-medium text-text">{ex!.name}</div>
-                <div className="text-xs text-text-dim">{ex!.description}</div>
-              </button>
+                <button onClick={() => setSelectedExercise(ex!.id)} className="flex-1 px-2 py-1 text-left">
+                  <div className="font-medium text-text">{ex!.name}</div>
+                  <div className="text-xs text-text-dim">{ex!.description}</div>
+                </button>
+                <button
+                  onClick={() => setInfoExercise(ex!)}
+                  aria-label={`How to do ${ex!.name}`}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-hi text-text-dim transition hover:text-primary"
+                >
+                  ⓘ
+                </button>
+              </div>
             ))}
           </div>
           <button
@@ -183,17 +193,28 @@ function StandardQuestScreen({
       )}
 
       {phase === 'done' && result?.levelUp && <LevelUpModal info={result.levelUp} onClose={onFinish} />}
+      {infoExercise && <ExerciseInfoModal exercise={infoExercise} onClose={() => setInfoExercise(null)} />}
     </div>
   );
 }
 
 function ActiveExercise({ exerciseId, onComplete }: { exerciseId: string; onComplete: () => void }) {
   const exercise = getExercise(exerciseId);
+  const [showInfo, setShowInfo] = useState(false);
   if (!exercise) return null;
 
   return (
     <div className="rounded-xl border border-border bg-surface p-5">
-      <h2 className="mb-2 text-xl font-bold text-text">{exercise.name}</h2>
+      <div className="mb-2 flex items-start justify-between">
+        <h2 className="text-xl font-bold text-text">{exercise.name}</h2>
+        <button
+          onClick={() => setShowInfo(true)}
+          aria-label={`How to do ${exercise.name}`}
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-hi text-text-dim transition hover:text-primary"
+        >
+          ⓘ
+        </button>
+      </div>
       <p className="mb-4 text-sm text-text-dim">{exercise.description}</p>
 
       <h3 className="mb-1 text-sm font-semibold text-text">How to do it</h3>
@@ -216,6 +237,8 @@ function ActiveExercise({ exerciseId, onComplete }: { exerciseId: string; onComp
       >
         Mark Complete
       </button>
+
+      {showInfo && <ExerciseInfoModal exercise={exercise} onClose={() => setShowInfo(false)} />}
     </div>
   );
 }
@@ -236,6 +259,7 @@ function RoutineQuestScreen({
   const [phase, setPhase] = useState<'overview' | 'active' | 'done'>('overview');
   const [checkedOff, setCheckedOff] = useState<Set<string>>(new Set());
   const [result, setResult] = useState<CompletionResult | null>(null);
+  const [infoExercise, setInfoExercise] = useState<Exercise | null>(null);
 
   const maybeRoutine = quest.routineId ? getRoutine(quest.routineId) : undefined;
   if (!maybeRoutine) return null;
@@ -273,13 +297,28 @@ function RoutineQuestScreen({
       ) : phase === 'overview' ? (
         <>
           <h2 className="mb-3 font-semibold text-text">Today's routine:</h2>
+          <p className="mb-3 text-xs text-text-dim">Tap ⓘ on any exercise to see how it's done.</p>
           <div className="mb-6 space-y-2">
             {specs.map(({ spec, exercise }) => (
-              <div key={spec.exerciseId} className="rounded-lg border border-border bg-surface px-4 py-3">
-                <div className="font-medium text-text">{exercise?.name}</div>
-                <div className="text-xs text-text-dim">
-                  {spec.sets} sets · {spec.reps ?? `${spec.durationSeconds}s hold`}
+              <div
+                key={spec.exerciseId}
+                className="flex items-center justify-between rounded-lg border border-border bg-surface px-4 py-3"
+              >
+                <div>
+                  <div className="font-medium text-text">{exercise?.name}</div>
+                  <div className="text-xs text-text-dim">
+                    {spec.sets} sets · {spec.reps ?? `${spec.durationSeconds}s hold`}
+                  </div>
                 </div>
+                {exercise && (
+                  <button
+                    onClick={() => setInfoExercise(exercise)}
+                    aria-label={`How to do ${exercise.name}`}
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-hi text-text-dim transition hover:text-primary"
+                  >
+                    ⓘ
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -300,14 +339,16 @@ function RoutineQuestScreen({
             {specs.map(({ spec, exercise }) => {
               const checked = checkedOff.has(spec.exerciseId);
               return (
-                <button
+                <div
                   key={spec.exerciseId}
-                  onClick={() => toggleChecked(spec.exerciseId)}
-                  className={`w-full rounded-xl border p-4 text-left transition ${
+                  className={`flex items-start gap-2 rounded-xl border p-3 transition ${
                     checked ? 'border-success/50 bg-success/10' : 'border-border bg-surface hover:border-primary/40'
                   }`}
                 >
-                  <div className="flex items-start gap-3">
+                  <button
+                    onClick={() => toggleChecked(spec.exerciseId)}
+                    className="flex flex-1 items-start gap-3 p-1 text-left"
+                  >
                     <span
                       className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs ${
                         checked ? 'border-success bg-success text-black' : 'border-border text-transparent'
@@ -330,8 +371,17 @@ function RoutineQuestScreen({
                         </div>
                       )}
                     </div>
-                  </div>
-                </button>
+                  </button>
+                  {exercise && (
+                    <button
+                      onClick={() => setInfoExercise(exercise)}
+                      aria-label={`How to do ${exercise.name}`}
+                      className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-hi text-text-dim transition hover:text-primary"
+                    >
+                      ⓘ
+                    </button>
+                  )}
+                </div>
               );
             })}
           </div>
@@ -348,6 +398,7 @@ function RoutineQuestScreen({
       )}
 
       {phase === 'done' && result?.levelUp && <LevelUpModal info={result.levelUp} onClose={onFinish} />}
+      {infoExercise && <ExerciseInfoModal exercise={infoExercise} onClose={() => setInfoExercise(null)} />}
     </div>
   );
 }
