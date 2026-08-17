@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useProfile } from '../lib/ProfileContext';
 import { NavBar } from '../components/NavBar';
+import { AccountPanel } from '../components/AccountPanel';
 import { getRankPosition, getLevelProgress } from '../data/ranks';
 
 export function Profile() {
@@ -43,6 +44,8 @@ export function Profile() {
           <span className="text-text font-mono">{new Date(profile.createdAt).toLocaleDateString()}</span>
         </div>
       </div>
+
+      <AccountPanel />
 
       <h2 className="mb-3 font-semibold text-text">Preferences</h2>
       <div className="mb-8 rounded-xl border border-border bg-surface p-4 text-sm space-y-2">
