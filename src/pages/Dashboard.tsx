@@ -75,7 +75,7 @@ export function Dashboard() {
                       <span className="text-gold font-semibold">{expToNextRank}</span> EXP to {rankProgress.next?.name}
                     </>
                   ) : (
-                    'Max rank reached — keep climbing Master'
+                    'Max rank reached — keep climbing Legend'
                   )}
                 </span>
                 <span className="text-primary">View ranks →</span>

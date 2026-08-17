@@ -90,7 +90,7 @@ export function Ranks() {
         })}
 
         <div className="rounded-xl border border-border bg-surface/40 p-4 text-center text-xs text-text-dim">
-          👑 Master keeps climbing forever — there's no final level.
+          🌌 Legend keeps climbing forever — there's no final level.
         </div>
       </div>
 

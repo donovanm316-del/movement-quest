@@ -8,6 +8,8 @@ export const RANKS: Rank[] = [
   { id: 'platinum', name: 'Platinum', icon: '💎', theme: 'Strong foundation', minExp: 7000 },
   { id: 'diamond', name: 'Diamond', icon: '🔥', theme: 'Advanced consistency', minExp: 12500 },
   { id: 'master', name: 'Master', icon: '👑', theme: 'Movement veteran', minExp: 20000 },
+  { id: 'grandmaster', name: 'Grandmaster', icon: '🌟', theme: 'Command your craft', minExp: 30000 },
+  { id: 'legend', name: 'Legend', icon: '🌌', theme: 'Beyond the stars', minExp: 45000 },
 ];
 
 export function getRankForExp(exp: number): Rank {
@@ -75,12 +77,13 @@ export function computeStartingExp(onboarding: OnboardingAnswers): number {
 // the next numbered level within the same rank; clearing level 3 promotes you
 // to the next rank entirely. Each level carries a small activity-themed title
 // so the climb feels like it's about movement and momentum, not just numbers.
-// Master has no ceiling, so it keeps climbing levels forever at a fixed pace.
+// The final rank (Legend) has no ceiling, so it keeps climbing levels forever
+// at a fixed pace.
 
 export const DIVISIONS_PER_LEVEL = 3;
 export const LEVELS_PER_RANK = 3;
 const DIVISIONS_PER_RANK = LEVELS_PER_RANK * DIVISIONS_PER_LEVEL;
-const MASTER_DIVISION_EXP = 1000;
+const TOP_RANK_DIVISION_EXP = 1000;
 
 export const RANK_LEVEL_NAMES: Record<Rank['id'], string[]> = {
   beginner: ['First Steps', 'Finding Your Rhythm', 'Warming Up'],
@@ -90,6 +93,8 @@ export const RANK_LEVEL_NAMES: Record<Rank['id'], string[]> = {
   platinum: ['Elite Drive', 'Relentless Pace', 'Unbreakable'],
   diamond: ['Powerhouse', 'Unstoppable Force', 'Diamond Discipline'],
   master: ['Movement Legend', 'Living Legend', 'Apex Mover'],
+  grandmaster: ['Elite Command', 'Dominant Force', 'Grandmaster Flow'],
+  legend: ['Legendary Momentum', 'Mythic Movement', 'Eternal Motion'],
 };
 
 export interface RankPosition {
@@ -105,7 +110,7 @@ export function getRankPosition(exp: number): RankPosition {
   const next = getNextRank(exp);
   const floor = rank.minExp;
   const progressExp = Math.max(0, exp - floor);
-  const divisionSize = next ? (next.minExp - floor) / DIVISIONS_PER_RANK : MASTER_DIVISION_EXP;
+  const divisionSize = next ? (next.minExp - floor) / DIVISIONS_PER_RANK : TOP_RANK_DIVISION_EXP;
 
   const divisionIndex = Math.floor(progressExp / divisionSize);
   const level = Math.floor(divisionIndex / DIVISIONS_PER_LEVEL) + 1;

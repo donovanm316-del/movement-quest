@@ -12,11 +12,13 @@ const GEM_COLORS: Record<string, GemColors> = {
   platinum: { fill: '#0ea5e9', fillLight: '#bae6fd', glow: '#38bdf8' },
   diamond: { fill: '#818cf8', fillLight: '#c7d2fe', glow: '#818cf8' },
   master: { fill: '#e879f9', fillLight: '#f5d0fe', glow: '#e879f9' },
+  grandmaster: { fill: '#f97316', fillLight: '#fed7aa', glow: '#fb923c' },
+  legend: { fill: '#f472b6', fillLight: '#fef08a', glow: '#facc15' },
 };
 
 export function RankGem({ rankId, size = 64 }: { rankId: string; size?: number }) {
   const c = GEM_COLORS[rankId] ?? GEM_COLORS.beginner;
-  const legendary = rankId === 'master';
+  const legendary = rankId === 'legend';
   const gradId = `gem-fill-${rankId}`;
   const glowId = `gem-glow-${rankId}`;
 
