@@ -3,7 +3,9 @@ import { useProfile } from '../lib/ProfileContext';
 import { NavBar } from '../components/NavBar';
 import { QuestCard } from '../components/QuestCard';
 import { ProgressRing } from '../components/ProgressRing';
+import { RankGem } from '../components/RankGem';
 import { getLevelProgress, getRankPosition, getRankProgress } from '../data/ranks';
+import { getOverallRating } from '../lib/stats';
 
 export function Dashboard() {
   const { profile, isQuestCompletedToday } = useProfile();
@@ -12,6 +14,7 @@ export function Dashboard() {
   const level = getLevelProgress(profile.exp);
   const position = getRankPosition(profile.exp);
   const rankProgress = getRankProgress(profile.exp);
+  const ovr = getOverallRating(profile.skills);
 
   const completedToday = profile.activeQuests.filter((q) => isQuestCompletedToday(q.id)).length;
   const totalToday = profile.activeQuests.length;
@@ -43,25 +46,24 @@ export function Dashboard() {
         <div className="lg:grid lg:grid-cols-[380px_1fr] lg:items-start lg:gap-8">
           <div className="lg:sticky lg:top-8 lg:space-y-6">
             <div className="relative mb-6 overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-surface to-surface-hi p-5 lg:mb-0">
-              <span className="pointer-events-none absolute -right-6 -top-6 text-[120px] leading-none opacity-[0.06]">
-                {position.rank.icon}
-              </span>
+              <div className="starfield pointer-events-none absolute inset-0 opacity-70" />
+              <div className="pointer-events-none absolute top-3 right-3 rounded-full bg-surface-hi/80 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-text-dim">
+                LV {level.level}
+              </div>
               <div className="relative flex items-center gap-4">
-                <ProgressRing pct={level.pct} size={84} strokeWidth={7}>
-                  <div className="text-center">
-                    <div className="text-[10px] font-semibold uppercase tracking-wide text-text-dim">LV</div>
-                    <div className="text-xl font-bold text-text">{level.level}</div>
-                  </div>
+                <ProgressRing pct={rankProgress.pct} size={88} strokeWidth={6} colorClass="text-primary">
+                  <RankGem rankId={position.rank.id} size={56} />
                 </ProgressRing>
                 <div className="flex-1">
-                  <div className="text-sm font-semibold text-primary">
-                    {position.rank.icon} {position.rank.name.toUpperCase()} {position.level} · Div {position.division}
+                  <div className="text-2xl font-bold text-text leading-none">OVR {ovr}</div>
+                  <div className="mt-1 text-sm font-semibold text-primary">
+                    {position.rank.name.toUpperCase()} {position.level} · Div {position.division}
                   </div>
-                  <div className="text-xs text-gold mb-1">{position.levelName}</div>
-                  <div className="text-xs text-text-dim">
-                    {profile.exp - level.floor}/{level.ceiling - level.floor} EXP to level {level.level + 1}
-                  </div>
+                  <div className="text-xs text-gold">{position.levelName}</div>
                 </div>
+              </div>
+              <div className="relative mt-3 text-xs text-text-dim">
+                {profile.exp - level.floor}/{level.ceiling - level.floor} EXP to level {level.level + 1}
               </div>
               <Link
                 to="/ranks"

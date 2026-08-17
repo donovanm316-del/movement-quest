@@ -1,6 +1,7 @@
 import { useProfile } from '../lib/ProfileContext';
 import { NavBar } from '../components/NavBar';
 import { ExpBar } from '../components/ExpBar';
+import { ConsistencyHeatmap } from '../components/ConsistencyHeatmap';
 import { ACHIEVEMENTS } from '../data/achievements';
 import type { SkillName } from '../lib/types';
 
@@ -66,24 +67,15 @@ export function Progress() {
         })}
       </div>
 
-      <h2 className="mb-3 font-semibold text-text">Adventure Streak</h2>
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="font-semibold text-text">Consistency</h2>
+        <span className="flex items-center gap-1 text-sm text-text-dim">
+          <span>🔥</span>
+          <span className="font-semibold text-primary">{profile.checkInDates.length}</span> day streak
+        </span>
+      </div>
       <div className="rounded-xl border border-border bg-surface p-4">
-        <div className="flex items-center justify-center gap-2">
-          <span className="text-3xl">🔥</span>
-          <span className="text-3xl font-bold text-primary">{profile.checkInDates.length}</span>
-        </div>
-        <div className="text-center text-sm text-text-dim">days checked in</div>
-        <div className="mt-3 flex justify-center gap-1">
-          {Array.from({ length: 7 }, (_, i) => {
-            const filled = i < Math.min(7, profile.checkInDates.length);
-            return (
-              <span
-                key={i}
-                className={`h-2 flex-1 max-w-6 rounded-full ${filled ? 'bg-primary' : 'bg-surface-hi'}`}
-              />
-            );
-          })}
-        </div>
+        <ConsistencyHeatmap completedAtDates={profile.completedQuests.map((c) => c.completedAt)} />
       </div>
 
       <NavBar />

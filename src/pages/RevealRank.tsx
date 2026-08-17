@@ -4,6 +4,8 @@ import { useProfile } from '../lib/ProfileContext';
 import { getRankPosition } from '../data/ranks';
 import { TreasureChest, type ChestState } from '../components/TreasureChest';
 import { Confetti } from '../components/Confetti';
+import { RankGem } from '../components/RankGem';
+import { getOverallRating } from '../lib/stats';
 
 export function RevealRank() {
   const { profile } = useProfile();
@@ -13,6 +15,7 @@ export function RevealRank() {
   if (!profile) return null;
   const position = getRankPosition(profile.exp);
   const rank = position.rank;
+  const ovr = getOverallRating(profile.skills);
 
   function handleClick() {
     if (state !== 'closed') return;
@@ -39,13 +42,17 @@ export function RevealRank() {
 
       {state === 'open' && (
         <div className="relative w-full animate-pop overflow-hidden rounded-2xl border border-gold/50 bg-surface p-6">
+          <div className="starfield pointer-events-none absolute inset-0 opacity-70" />
           <Confetti />
-          <div className="mb-2 text-5xl">{rank.icon}</div>
-          <div className="text-2xl font-bold text-text">
+          <div className="relative flex justify-center mb-2">
+            <RankGem rankId={rank.id} size={80} />
+          </div>
+          <div className="relative text-lg font-bold text-text">OVR {ovr}</div>
+          <div className="relative text-2xl font-bold text-text">
             {rank.name.toUpperCase()} {position.level} · DIV {position.division}
           </div>
-          <div className="mb-1 text-sm text-gold">{position.levelName}</div>
-          <div className="mb-4 text-xs text-text-dim">{rank.theme}</div>
+          <div className="relative mb-1 text-sm text-gold">{position.levelName}</div>
+          <div className="relative mb-4 text-xs text-text-dim">{rank.theme}</div>
           <div className="mb-6 inline-block rounded-full border border-border bg-surface-hi px-3 py-1 text-xs text-text-dim">
             Starting EXP: {profile.exp}
           </div>

@@ -1,5 +1,6 @@
 import { useProfile } from '../lib/ProfileContext';
 import { NavBar } from '../components/NavBar';
+import { RankGem } from '../components/RankGem';
 import {
   RANKS,
   RANK_LEVEL_NAMES,
@@ -7,6 +8,7 @@ import {
   LEVELS_PER_RANK,
   getRankPosition,
 } from '../data/ranks';
+import { getOverallRating } from '../lib/stats';
 
 type Status = 'completed' | 'current' | 'locked';
 
@@ -16,6 +18,7 @@ export function Ranks() {
 
   const position = getRankPosition(profile.exp);
   const currentIdx = RANKS.findIndex((r) => r.id === position.rank.id);
+  const ovr = getOverallRating(profile.skills);
 
   return (
     <div className="mx-auto max-w-md px-6 pb-28 pt-10">
@@ -25,13 +28,17 @@ export function Ranks() {
         levels to promote.
       </p>
 
-      <div className="mb-6 rounded-2xl border border-primary/40 bg-gradient-to-br from-surface to-surface-hi p-5 text-center">
-        <div className="text-4xl mb-1">{position.rank.icon}</div>
-        <div className="text-lg font-bold text-text">
-          {position.rank.name.toUpperCase()} {position.level} · DIV {position.division}
+      <div className="relative mb-6 overflow-hidden rounded-2xl border border-primary/40 bg-gradient-to-br from-surface to-surface-hi p-5 text-center">
+        <div className="starfield pointer-events-none absolute inset-0 opacity-70" />
+        <div className="relative flex flex-col items-center">
+          <RankGem rankId={position.rank.id} size={72} />
+          <div className="mt-2 text-xl font-bold text-text">OVR {ovr}</div>
+          <div className="text-sm font-bold text-primary">
+            {position.rank.name.toUpperCase()} {position.level} · DIV {position.division}
+          </div>
+          <div className="text-sm text-gold">{position.levelName}</div>
+          <div className="mt-2 text-xs text-text-dim">{profile.exp} total EXP</div>
         </div>
-        <div className="text-sm text-gold">{position.levelName}</div>
-        <div className="mt-2 text-xs text-text-dim">{profile.exp} total EXP</div>
       </div>
 
       <div className="space-y-3">
